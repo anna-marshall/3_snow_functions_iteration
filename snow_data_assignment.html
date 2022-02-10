@@ -242,7 +242,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Snow Data Assignment: Web Scraping, Functions, and Iteration</h1>
 <h4 class="author">Anna Marshall</h4>
-<h4 class="date">‘r format(Sys.time(),’%d %B, %Y’)’</h4>
+<h4 class="date">09 February, 2022</h4>
 
 </div>
 
@@ -432,7 +432,7 @@ for (i in 2005:2010){
 <h2>Bonus 1</h2>
 <div id="plot-of-average-daily-precipitation-by-day-of-year-averaged-across-all-available-years." class="section level3">
 <h3>Plot of average daily precipitation by day of year (averaged across all available years).</h3>
-<p>Precipitation data here was converted from kg m-2 s-1 to mm/day. However, the precipitation values are not realistic and suggest the conversion was inacurrate. Nonetheless, the general pattern can still be gleaned from these plots.</p>
+<p>Precipitation data here was converted from kg m-2 s-1 to mm/day. However, the precipitation values are not realistic and suggest the conversion was inaccurate. Nonetheless, the general pattern can still be gleaned from these plots.</p>
 <pre class="r"><code>names(weather_data_full)[names(weather_data_full)==&#39;precip [kg m-2 s-1&#39;]&lt;-&quot;precip&quot;
 weather_data_full$`precip [kg m-2 s-1]`&lt;-weather_data_full$`precip [kg m-2 s-1]`*86400
   precip_daily &lt;- weather_data_full %&gt;% filter(year==i) %&gt;%
