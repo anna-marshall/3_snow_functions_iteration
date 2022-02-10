@@ -28,10 +28,10 @@ Here is a map from the Center for Snow and Avalanche Studies indicating sample s
 ![](https://snowstudies.org/Area_AirPhoto_wLocation_650w.png)
 In the assignment below, I'll work through manipulating some of the precipitation and temperature data collected as part of the long term Mountain System Monitoring. 
 
-#Methods
+# Methods
 This analysis uses the `SASP forcing` and `SBSP_forcing` meteorological data sets to understand how temperature and precipitation patterns change with time at the two sites.
 
-#Analysis and Discussion
+# Analysis and Discussion
 
 ## Q1
 
@@ -55,7 +55,7 @@ links
 
 ### Download the meteorological data. Use the `download_file` and `str_split_fixed` commands to download the data and save it in your data folder.
 
-### Downloaded data in a for loop
+Downloaded data in a for loop
 
 ```{r warning=FALSE}
 
@@ -106,7 +106,7 @@ headers <- pdf_text('https://snowstudies.org/wp-content/uploads/2022/02/Serially
 
 ### Writing a custom function to read in the data and append a site column to the data. 
 
-As a for loop
+Below is code for creating a for loop to read in the data. Note the function is included in Q4 where I use map to read in the data and append a site column.
 
 ```{r warning=FALSE, message=FALSE, results=FALSE}
 #Pattern matching to only keep certain files
@@ -146,7 +146,7 @@ weather_data_map<- function(file){
 weather_data_full <- map_dfr(weather_files,weather_data_map)
 summary(weather_data_full)
 ```
-##Q5
+## Q5
 
 ### Make a line plot of mean temp by year by site 
 
@@ -169,40 +169,72 @@ ggplot(temp_yearly,aes(x=year, y=mean_temp,color=site))+
 
 ## Q6
 
-Write a function that makes line plots of monthly average temperature at each site for a given year. Use a for loop to make these plots for 2005 to 2010. 
+### Write a function that makes line plots of monthly average temperature at each site for a given year. Use a for loop to make these plots for 2005 to 2010. 
 
-Are monthly average temperatures at the Senator Beck Study Plot ever warmer than the Snow Angel Study Plot?
+Monthly average temperatures are always warmer at the Swamp Angel study plot compared to the Senator Beck study plot.This makes sense given that SASP is located in a sheltered location below treeline.SBSP is located above treeline in the alpine tundrea. 
 
 ```{r warning=FALSE, message=FALSE}
 names(weather_data_full)[names(weather_data_full)=='air temp [K]']<-"air_temp"
-temp_monthly <- weather_data_full %>%
-  group_by(month,site,year) %>%
-  summarize(mean_temp = mean(air_temp,na.rm=T))
-
-years<-list(~2005, ~2006,~2007, ~2008,~2009, ~2010)
-for (i in 2005:2010){
-  print(ggplot(temp_monthly,aes(x=month,y=mean_temp,color=site)) +
-          geom_point()+  
-          ggthemes::theme_few()+
-          ggthemes::scale_color_few())
+plotfunction<-function(year){
+  yeardata<-weather_data_full %>% filter(year==i) %>%
+    group_by(month,site) %>%
+    summarise(mean_temp = mean(air_temp,na.rm=T))
+  print(ggplot(yeardata,aes(x=month,y=mean_temp,color=site))+
+          geom_line()+
+          geom_point()+
+          ggthemes::theme_few()+ 
+          ylab("Mean Air Temperature (K)")+
+          xlab("Month")+
+          ggthemes::scale_color_few()+
+          scale_x_continuous(breaks=c(1,2,3,4,5,6,7,8,9,10,11,12))+
+          ggtitle(year))
+        
 }
-
+for (i in 2005:2010){
+  plotfunction(i)}
 
 ```
+
 ## Bonus 1
 
-Plot of average daily precipitation by day of year (averaged across all available years). 
+
+### Plot of average daily precipitation by day of year (averaged across all available years). 
+
+Precipitation data here was converted from kg m-2 s-1 to mm/day. However, the precipitation values are not realistic and suggest the conversion was inaccurate. Nonetheless, the general pattern can still be gleaned from these plots. 
 ```{r}
 names(weather_data_full)[names(weather_data_full)=='precip [kg m-2 s-1']<-"precip"
 weather_data_full$`precip [kg m-2 s-1]`<-weather_data_full$`precip [kg m-2 s-1]`*86400
-  precip_daily <- weather_data_full %>%
-  group_by(day,year) %>%
-  summarize(mean_precip = mean(`precip [kg m-2 s-1]`,na.rm=T))
+  precip_daily <- weather_data_full %>% filter(year==i) %>%
+    group_by(day) %>%
+    summarize(mean_precip = mean(`precip [kg m-2 s-1]`,na.rm=T))
 ggplot(precip_daily,aes(x=day,y=mean_precip)) +
   geom_point()+
+  geom_line()+
   ggthemes::theme_few()+
   ggthemes::scale_color_few()
 ```
+
 ## Bonus 2
 
- Use a function and for loop to create yearly plots of precipitation by day of year. Color each site. 
+### Use a function and for loop to create yearly plots of precipitation by day of year. 
+
+```{r}
+plotfunction<-function(year){
+  yeardata2<-weather_data_full %>% filter(year==i) %>%
+    group_by(day) %>%
+    summarize(mean_precip = mean(`precip [kg m-2 s-1]`,na.rm=T))
+  print(ggplot(yeardata2,aes(x=day,y=mean_precip))+
+          geom_line()+
+          geom_point()+
+          ggthemes::theme_few()+
+          ylab("Mean Air Temperature (K)")+
+          xlab("Month")+
+          ggthemes::scale_color_few()+
+          ggtitle(year))
+        
+}
+for (i in 2005:2010){
+  plotfunction(i)}
+
+```
+
